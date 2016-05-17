@@ -76,6 +76,23 @@ public class KeyStoreReader {
 
 	}
 	
+	public KeyStore readKeyStore(String path, char[] password) {
+		KeyStore ks = null;
+
+		try {
+			ks = KeyStore.getInstance("JKS", "SUN");
+			BufferedInputStream in;
+			in = new BufferedInputStream(new FileInputStream(path));
+			ks.load(in, password);
+		} catch (NoSuchAlgorithmException | CertificateException
+				| KeyStoreException | NoSuchProviderException | IOException e) {
+			ks = null;
+	
+		}
+
+		return ks;
+	}
+	
 	public static void main(String[] args) {
 		KeyStoreReader test = new KeyStoreReader();
 		test.testIt();

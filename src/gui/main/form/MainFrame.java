@@ -12,6 +12,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import actions.main.form.GenerateSelfSignedAction;
+import actions.main.form.GenerateSignedAction;
 
 
 public class MainFrame extends JFrame{
@@ -53,10 +54,11 @@ public class MainFrame extends JFrame{
 
 		JMenu orgSemaMenu = new JMenu("Edit");
 		orgSemaMenu.setMnemonic(KeyEvent.VK_O);
-		JMenuItem drzaveMI = new JMenuItem(new GenerateSelfSignedAction());
-		orgSemaMenu.add(drzaveMI);
-		//JMenuItem mestoMI = new JMenuItem(new NaseljenoMestoAction());
-		//orgSemaMenu.add(mestoMI);
+		JMenuItem GenerateSelfSignedActionMI = new JMenuItem(new GenerateSelfSignedAction());
+		orgSemaMenu.add(GenerateSelfSignedActionMI);
+		JMenuItem GenerateSignedActionMI = new JMenuItem(new GenerateSignedAction());
+		orgSemaMenu.add(GenerateSignedActionMI);
+
 
 		menuBar.add(orgSemaMenu);
 		

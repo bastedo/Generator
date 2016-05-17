@@ -14,7 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
 import net.miginfocom.swing.MigLayout;
-import security.KeyStoreReader;
+import rs.ac.uns.ftn.informatika.ib.security.KeyStoreReader;
+
 
 public class KeyStorePasswordDialog extends JDialog {
 
