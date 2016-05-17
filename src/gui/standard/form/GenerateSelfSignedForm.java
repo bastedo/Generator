@@ -24,10 +24,11 @@ public class GenerateSelfSignedForm extends JDialog{
 
 	private JButton btnSave, btnCancel ;
 	private JTextField tfValidity = new JTextField(4);
-	private JTextField tfCommonName = new JTextField(20);
+	private JTextField tfSurName = new JTextField(20);
+	private JTextField tfGivenName = new JTextField(20);
 	private JTextField tfOrganisationUnit = new JTextField(20);
 	private JTextField tfOrganisationName = new JTextField(20);
-	private JTextField tfLocalityName = new JTextField(20);
+
 	private JTextField tfStateName = new JTextField(20);
 	private JTextField tfCountry = new JTextField(3);
 	private JTextField tfEmail = new JTextField(20);
@@ -79,22 +80,23 @@ public class GenerateSelfSignedForm extends JDialog{
 //
 //
 		JLabel lblValidity = new JLabel ("Validity(days):");
-		JLabel lblCommonName = new JLabel("CommonName:");
-		JLabel lblOrganisationUnit = new JLabel("OrganisationUnit:");
-		JLabel lblOrganisationName = new JLabel("OrganisationName:");
-		JLabel lblLocalityName = new JLabel("LocalityName:");
+		JLabel lblSurName = new JLabel("Surname:");
+		JLabel lblOrganisationUnit = new JLabel("Organisation Unit:");
+		JLabel lblOrganisationName = new JLabel("Organisation Name:");
+		JLabel lblGivenName = new JLabel("Given Name:");
 		JLabel lblStateName= new JLabel("StateName:");
 		JLabel lblCountry = new JLabel("Country:");
 		JLabel lblEmail = new JLabel("Email:");
 //
 		dataPanel.add(lblValidity);
 		dataPanel.add(tfValidity);
-		dataPanel.add(lblCommonName);
-		dataPanel.add(tfCommonName);
+		dataPanel.add(lblSurName);
+		dataPanel.add(tfSurName);
+		dataPanel.add(lblGivenName);
+		dataPanel.add(tfGivenName);
 		dataPanel.add(lblOrganisationUnit);
 		dataPanel.add(tfOrganisationUnit);
-		dataPanel.add(lblLocalityName);
-		dataPanel.add(tfLocalityName);
+
 		dataPanel.add(lblStateName);
 		dataPanel.add(tfStateName);
 		dataPanel.add(lblCountry);
@@ -126,8 +128,8 @@ public class GenerateSelfSignedForm extends JDialog{
 
 
 
-	public String getTfCommonName() {
-		return tfCommonName.getText();
+	public String getTfSurName() {
+		return tfSurName.getText();
 	}
 
 
@@ -145,8 +147,8 @@ public class GenerateSelfSignedForm extends JDialog{
 
 
 
-	public String getTfLocalityName() {
-		return tfLocalityName.getText();
+	public String getTfGivenName() {
+		return tfGivenName.getText();
 	}
 
 

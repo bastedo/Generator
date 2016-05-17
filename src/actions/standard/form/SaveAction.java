@@ -2,6 +2,13 @@ package actions.standard.form;
 
 
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.text.ParseException;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,10 +39,10 @@ public class SaveAction extends AbstractAction {
 		if (standardForm instanceof GenerateSelfSignedForm){
 			HashMap<String, String> dictionary =new HashMap<String, String>();
 			dictionary.put("Validity" , ((GenerateSelfSignedForm)standardForm).getTfValidity());
-			dictionary.put("CommonName" , ((GenerateSelfSignedForm)standardForm).getTfCommonName());
+			dictionary.put("Surname" , ((GenerateSelfSignedForm)standardForm).getTfSurName());
 			dictionary.put("OrganisationUnit" , ((GenerateSelfSignedForm)standardForm).getTfOrganisationUnit());
 			dictionary.put("OrganisationName" , ((GenerateSelfSignedForm)standardForm).getTfOrganisationName());
-			dictionary.put("LocalityName" , ((GenerateSelfSignedForm)standardForm).getTfLocalityName());
+			dictionary.put("GivenName" , ((GenerateSelfSignedForm)standardForm).getTfGivenName());
 			dictionary.put("StateName" , ((GenerateSelfSignedForm)standardForm).getTfStateName());
 			dictionary.put("Country" , ((GenerateSelfSignedForm)standardForm).getTfCountry());
 			dictionary.put("Email" , ((GenerateSelfSignedForm)standardForm).getTfEmail());
@@ -48,7 +55,13 @@ public class SaveAction extends AbstractAction {
 		}else if (standardForm instanceof KeyPairEntryPasswordForm){
 			HashMap<String, String> dictionary = ((KeyPairEntryPasswordForm)standardForm).getDictionary() ;
 			dictionary.put("KeyPairPassword" , ((KeyPairEntryPasswordForm)standardForm).getJpfKsPassword());
-			
+			try {
+				((KeyPairEntryPasswordForm)standardForm).generateCertificate() ;
+			} catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException
+					| SignatureException | ParseException | IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		
 		

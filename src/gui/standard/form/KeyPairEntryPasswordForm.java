@@ -4,10 +4,26 @@ import gui.main.form.MainFrame;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -15,10 +31,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 
 import actions.standard.form.CancelAction;
 import actions.standard.form.SaveAction;
 import net.miginfocom.swing.MigLayout;
+import rs.ac.uns.ftn.informatika.ib.security.CertificateGenerator;
+import rs.ac.uns.ftn.informatika.ib.security.IssuerData;
+import rs.ac.uns.ftn.informatika.ib.security.KeyStoreWriter;
+import rs.ac.uns.ftn.informatika.ib.security.SubjectData;
 
 public class KeyPairEntryPasswordForm extends JDialog{
 	private static final long serialVersionUID = 1L;
@@ -34,7 +58,7 @@ public class KeyPairEntryPasswordForm extends JDialog{
 
 		setLayout(new MigLayout("fill"));
 		this.dictionary = dic ;
-		setSize(new Dimension(300, 180));
+		setSize(new Dimension(300, 120));
 		setTitle("Generate Self Signed Certificat ");
 		setLocationRelativeTo(MainFrame.getInstance());
 		setModal(true);
@@ -64,7 +88,7 @@ public class KeyPairEntryPasswordForm extends JDialog{
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.setLayout(new GridLayout(0,2));
 		JPanel dataPanel = new JPanel();
-		dataPanel.setLayout(new GridLayout(2,1));
+		dataPanel.setLayout(new GridLayout(3,2));
 
 		JPanel buttonsPanel = new JPanel(new GridLayout(0,2));
 		btnSave = new JButton(new SaveAction(this));
@@ -101,8 +125,104 @@ public class KeyPairEntryPasswordForm extends JDialog{
 		return dictionary;
 	}
 	
-	public void generate
-	
+	public void generateCertificate() throws ParseException, InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
+		CertificateGenerator certi = new CertificateGenerator();
+		
+		//kreira se self signed sertifikat
+		//par kljuceva
+		KeyPair keyPair = certi.generateKeyPair();
+		
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat iso8601Formater = new SimpleDateFormat("yyyy-MM-dd");
+		Date startDate = iso8601Formater.parse(iso8601Formater.format(cal.getTime()));
+		cal.add(Calendar.DATE, Integer.parseInt(dictionary.get("Validity")));
+		Date endDate = iso8601Formater.parse(iso8601Formater.format(cal.getTime()));
+		
+		//podaci o vlasniku i izdavacu posto je self signed 
+		//klasa X500NameBuilder pravi X500Name objekat koji nam treba
+		X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+	    builder.addRDN(BCStyle.CN, dictionary.get("SurName")+dictionary.get("GivenName"));
+	    builder.addRDN(BCStyle.SURNAME, dictionary.get("Surname"));
+	    builder.addRDN(BCStyle.GIVENNAME, dictionary.get("GivenName"));
+	    builder.addRDN(BCStyle.O, dictionary.get("OrganisationName"));
+	    builder.addRDN(BCStyle.OU, dictionary.get("OrganisationUnit"));
+	    builder.addRDN(BCStyle.C,dictionary.get("Country"));
+	    builder.addRDN(BCStyle.E, dictionary.get("Email"));
+	    //UID (USER ID) je ID korisnika
+	    int uid = gen();
+	    builder.addRDN(BCStyle.UID, dictionary.get("Alias")+uid );
+	    
+	    String sn=Integer.toString(uid);
+	    
+	    
+		//kreiraju se podaci za issuer-a
+		IssuerData issuerData = new IssuerData(keyPair.getPrivate(), builder.build());
+		//kreiraju se podaci za vlasnika
+		SubjectData subjectData = new SubjectData(keyPair.getPublic(), builder.build(), sn, startDate, endDate);
+		
+		//generise se sertifikat
+		X509Certificate cert = certi.generateCertificate(issuerData, subjectData);
+		
+		System.out.println("ISSUER: " + cert.getIssuerX500Principal().getName());
+		System.out.println("SUBJECT: " + cert.getSubjectX500Principal().getName());
+		System.out.println("Sertifikat:");
+		System.out.println("-------------------------------------------------------");
+		System.out.println(cert);
+		System.out.println("-------------------------------------------------------");
+		//ako validacija nije uspesna desice se exception
+		
+//		//ovde bi trebalo da prodje
+//		cert.verify(keyPair.getPublic());
+//		System.out.println("VALIDACIJA USPESNA....");
+		
+		//ovde bi trebalo da se desi exception, jer validaciju vrsimo drugim kljucem
+		//KeyPair anotherPair = generateKeyPair();
+		//cert.verify(anotherPair.getPublic());
+		
+		
+		JFileChooser saveDialog = new JFileChooser();
+		saveDialog.setSelectedFile(new File(dictionary.get("Alias") + "." + "jks"));
+		saveDialog.setFileFilter(new FileNameExtensionFilter( "KeyStore(*.jks)", "jks"));
+		
+		int saveDialogRetVal = saveDialog.showSaveDialog(null);
+		
+		if (saveDialogRetVal == JFileChooser.APPROVE_OPTION) {
+			
+		//kreira se keystore, ucitava ks fajl, dodaje kljuc i sertifikat i sacuvaju se izmene
+		KeyStoreWriter keyStoreWriter = new KeyStoreWriter();
+		
+		File file = saveDialog.getSelectedFile();
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		keyStoreWriter.loadKeyStore(null, dictionary.get("KeyPairPassword").toCharArray());
+		keyStoreWriter.write(dictionary.get("Alias"), keyPair.getPrivate(), dictionary.get("KeyPairPassword").toCharArray(), cert);
+		keyStoreWriter.saveKeyStore(file.getPath(), dictionary.get("KeyPairPassword").toCharArray());
+
+		String[] path = file.getAbsolutePath().split("jks");
+		
+		FileOutputStream fos = new FileOutputStream(path[0] + "cer");
+		fos.write(cert.getEncoded());
+		fos.flush();
+		fos.close();
+		
+
+	}
+
+
+	}
+
+
+
+	public int gen() { //random petocifreni broj
+	    Random r = new Random( System.currentTimeMillis() );
+	    return (1 + r.nextInt(2)) * 10000 + r.nextInt(10000);
+	}
 
 
 
