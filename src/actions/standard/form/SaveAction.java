@@ -46,12 +46,17 @@ public class SaveAction extends AbstractAction {
 			dictionary.put("StateName" , ((GenerateSelfSignedForm)standardForm).getTfStateName());
 			dictionary.put("Country" , ((GenerateSelfSignedForm)standardForm).getTfCountry());
 			dictionary.put("Email" , ((GenerateSelfSignedForm)standardForm).getTfEmail());
-			new KeyPairEntryAliasForm(dictionary).setVisible(true); 
+			((GenerateSelfSignedForm)standardForm).setVisible(false);
+			new KeyPairEntryAliasForm(dictionary, (GenerateSelfSignedForm)standardForm ).setVisible(true);
+			
 			
 		}else if (standardForm instanceof KeyPairEntryAliasForm){
 			HashMap<String, String> dictionary = ((KeyPairEntryAliasForm)standardForm).getDictionary() ;
 			dictionary.put("Alias" , ((KeyPairEntryAliasForm)standardForm).getEnterAlias());
-			new KeyPairEntryPasswordForm(dictionary).setVisible(true);
+			((KeyPairEntryAliasForm)standardForm).setVisible(false);
+			new KeyPairEntryPasswordForm(dictionary, ((KeyPairEntryAliasForm)standardForm)).setVisible(true);
+			
+			
 		}else if (standardForm instanceof KeyPairEntryPasswordForm){
 			HashMap<String, String> dictionary = ((KeyPairEntryPasswordForm)standardForm).getDictionary() ;
 			dictionary.put("KeyPairPassword" , ((KeyPairEntryPasswordForm)standardForm).getJpfKsPassword());
@@ -62,6 +67,7 @@ public class SaveAction extends AbstractAction {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+			((KeyPairEntryPasswordForm)standardForm).disposeCastum();
 		}
 		
 		

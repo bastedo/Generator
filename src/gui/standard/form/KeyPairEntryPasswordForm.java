@@ -52,10 +52,10 @@ public class KeyPairEntryPasswordForm extends JDialog{
 	private JPasswordField jpfKsPassword = new JPasswordField();
 	private JPasswordField jpfConfirmKsPassword = new JPasswordField();
 	private HashMap<String, String> dictionary = new HashMap<String, String>();
+	private KeyPairEntryAliasForm parent;
 	
-	
-	public KeyPairEntryPasswordForm(HashMap<String, String> dic){
-
+	public KeyPairEntryPasswordForm(HashMap<String, String> dic, KeyPairEntryAliasForm parent1){
+		this.parent = parent1 ;
 		setLayout(new MigLayout("fill"));
 		this.dictionary = dic ;
 		setSize(new Dimension(300, 120));
@@ -223,7 +223,23 @@ public class KeyPairEntryPasswordForm extends JDialog{
 	    Random r = new Random( System.currentTimeMillis() );
 	    return (1 + r.nextInt(2)) * 10000 + r.nextInt(10000);
 	}
+	public void disposeCastum() {
+		this.parent.disposeCastum();
+		this.dispose();
+	}
 
+
+
+	public KeyPairEntryAliasForm getParent() {
+		return parent;
+	}
+
+
+
+	public void setParent(KeyPairEntryAliasForm parent) {
+		this.parent = parent;
+	}
+	
 
 
 }

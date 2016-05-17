@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,12 +25,14 @@ public class KeyPairEntryAliasForm extends JDialog{
 	
 
 	private JButton btnSave, btnCancel ;
+	private GenerateSelfSignedForm parent;
 	private JTextField tfEnterAlias = new JTextField(20);
 	private HashMap<String, String> dictionary = new HashMap<String, String>();
 	
 	
-	public KeyPairEntryAliasForm(HashMap<String, String> dic){
-
+	public KeyPairEntryAliasForm(HashMap<String, String> dic, GenerateSelfSignedForm parent1){
+		
+		this.parent = parent1;
 		setLayout(new MigLayout("fill"));
 		this.dictionary = dic ;
 		setSize(new Dimension(300, 180));
@@ -103,4 +106,23 @@ public class KeyPairEntryAliasForm extends JDialog{
 		this.dictionary = dictionary;
 	}
 
+
+
+	public void disposeCastum() {
+		this.parent.dispose();
+		this.dispose();
+	}
+
+
+
+	public GenerateSelfSignedForm getParent() {
+		return parent;
+	}
+
+
+
+	public void setParent(GenerateSelfSignedForm parent) {
+		this.parent = parent;
+	}
+	
 }
