@@ -185,6 +185,18 @@ public class GenerateSelfSignedForm extends JDialog{
 
 
 
+	public String getPasswordKey() {
+		return passwordKey;
+	}
+	public void setPasswordKey(String passwordKey) {
+		this.passwordKey = passwordKey;
+	}
+	public KeyStore getKeyStore() {
+		return keyStore;
+	}
+	public void setKeyStore(KeyStore keyStore) {
+		this.keyStore = keyStore;
+	}
 	public String getTfEmail() {
 		return tfEmail.getText();
 	}

@@ -140,5 +140,11 @@ public KeyPairEntryAliasForm(HashMap<String, String> dic, GenerateSelfSignedForm
 	public void setParent(GenerateSelfSignedForm parent) {
 		this.parent = parent;
 	}
+	public KeyStore getKeyStore() {
+		return keyStore;
+	}
+	public void setKeyStore(KeyStore keyStore) {
+		this.keyStore = keyStore;
+	}
 	
 }

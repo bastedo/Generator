@@ -197,6 +197,12 @@ public class KeyPairEntryPasswordForm extends JDialog{
 
 			X500Name caX500Name = new X500Name(cert.getSubjectX500Principal().getName());
 			
+			
+			System.out.println(dictionary.get("PasswordKey"));
+			
+			System.out.println(aliases.get(0));
+			
+			
 			//menjamo issuarData podacima o sertifikatu koji ga izdaje, potpisujemo ga njegovim privatnim kljucem
 			issuerData = new IssuerData((PrivateKey)keyStore.getKey(
 					aliases.get(0),	dictionary.get("PasswordKey").toCharArray())
@@ -285,6 +291,10 @@ public class KeyPairEntryPasswordForm extends JDialog{
 
 	public void setParent(KeyPairEntryAliasForm parent) {
 		this.parent = parent;
+	}
+	public String getJpfKsConfirmPassword() {
+		// TODO Auto-generated method stub
+		return jpfConfirmKsPassword.getText();
 	}
 	
 

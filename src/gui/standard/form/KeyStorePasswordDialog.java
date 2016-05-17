@@ -81,7 +81,8 @@ public class KeyStorePasswordDialog extends JDialog {
 					
 					if (keyStore != null){
 						setVisible(false);
-						new GenerateSelfSignedForm(keyStore, jpfPassword.getPassword().toString()).setVisible(true);
+						System.out.println(jpfPassword.getText());
+						new GenerateSelfSignedForm(keyStore, jpfPassword.getText()).setVisible(true);
 						
 					}else
 						JOptionPane.showMessageDialog(kspDialog,
