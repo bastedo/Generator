@@ -4,6 +4,7 @@ import gui.main.form.MainFrame;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.security.KeyStore;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -28,17 +29,33 @@ public class GenerateSelfSignedForm extends JDialog{
 	private JTextField tfGivenName = new JTextField(20);
 	private JTextField tfOrganisationUnit = new JTextField(20);
 	private JTextField tfOrganisationName = new JTextField(20);
-
+	
 	private JTextField tfStateName = new JTextField(20);
 	private JTextField tfCountry = new JTextField(3);
 	private JTextField tfEmail = new JTextField(20);
-	
+	private String passwordKey = null ;
+	private KeyStore keyStore= null;
 	
 	
 	public GenerateSelfSignedForm(){
 
 		setLayout(new MigLayout("fill"));
 
+		setSize(new Dimension(400, 300));
+		setTitle("Generate Self Signed Certificat ");
+		setLocationRelativeTo(MainFrame.getInstance());
+		setModal(true);
+		setResizable(false);
+		
+		initToolbar();
+		
+		initGui();
+		
+	}
+	public GenerateSelfSignedForm(KeyStore keyStore1, String pass){
+		this.passwordKey = pass ;
+		setLayout(new MigLayout("fill"));
+		this.keyStore = keyStore1 ;
 		setSize(new Dimension(400, 300));
 		setTitle("Generate Self Signed Certificat ");
 		setLocationRelativeTo(MainFrame.getInstance());

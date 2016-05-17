@@ -79,9 +79,11 @@ public class KeyStorePasswordDialog extends JDialog {
 					KeyStoreReader reader = new KeyStoreReader();
 					keyStore = reader.readKeyStore(keyStorePath, jpfPassword.getPassword());
 					
-					if (keyStore != null)
+					if (keyStore != null){
 						setVisible(false);
-					else
+						new GenerateSelfSignedForm(keyStore, jpfPassword.getPassword().toString()).setVisible(true);
+						
+					}else
 						JOptionPane.showMessageDialog(kspDialog,
 								"Pogrešna šifra!", "Warning!",
 								JOptionPane.WARNING_MESSAGE);

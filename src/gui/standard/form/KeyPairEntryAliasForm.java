@@ -4,6 +4,7 @@ import gui.main.form.MainFrame;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.security.KeyStore;
 import java.util.HashMap;
 
 import javax.swing.JButton;
@@ -23,7 +24,7 @@ import net.miginfocom.swing.MigLayout;
 public class KeyPairEntryAliasForm extends JDialog{
 	private static final long serialVersionUID = 1L;
 	
-
+	private KeyStore keyStore= null;
 	private JButton btnSave, btnCancel ;
 	private GenerateSelfSignedForm parent;
 	private JTextField tfEnterAlias = new JTextField(20);
@@ -32,6 +33,21 @@ public class KeyPairEntryAliasForm extends JDialog{
 	
 	public KeyPairEntryAliasForm(HashMap<String, String> dic, GenerateSelfSignedForm parent1){
 		
+		this.parent = parent1;
+		setLayout(new MigLayout("fill"));
+		this.dictionary = dic ;
+		setSize(new Dimension(300, 180));
+		setTitle("Generate Self Signed Certificat ");
+		setLocationRelativeTo(MainFrame.getInstance());
+		setModal(true);
+		
+		initToolbar();
+		
+		initGui();
+		
+	}
+public KeyPairEntryAliasForm(HashMap<String, String> dic, GenerateSelfSignedForm parent1, KeyStore keyStore1 ){
+		this.keyStore = keyStore1;
 		this.parent = parent1;
 		setLayout(new MigLayout("fill"));
 		this.dictionary = dic ;

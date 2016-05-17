@@ -9,14 +9,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
@@ -33,6 +39,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 
@@ -47,7 +54,7 @@ import rs.ac.uns.ftn.informatika.ib.security.SubjectData;
 public class KeyPairEntryPasswordForm extends JDialog{
 	private static final long serialVersionUID = 1L;
 	
-
+	private KeyStore keyStore= null;
 	private JButton btnSave, btnCancel ;
 	private JPasswordField jpfKsPassword = new JPasswordField();
 	private JPasswordField jpfConfirmKsPassword = new JPasswordField();
@@ -68,7 +75,21 @@ public class KeyPairEntryPasswordForm extends JDialog{
 		initGui();
 		
 	}
-	
+	public KeyPairEntryPasswordForm(HashMap<String, String> dic, KeyPairEntryAliasForm parent1, KeyStore keyStore1){
+		this.keyStore = keyStore1;
+		this.parent = parent1 ;
+		setLayout(new MigLayout("fill"));
+		this.dictionary = dic ;
+		setSize(new Dimension(300, 120));
+		setTitle("Generate Self Signed Certificat ");
+		setLocationRelativeTo(MainFrame.getInstance());
+		setModal(true);
+		
+		initToolbar();
+		
+		initGui();
+		
+	}
 	
 	
 	private void initToolbar(){
@@ -125,7 +146,7 @@ public class KeyPairEntryPasswordForm extends JDialog{
 		return dictionary;
 	}
 	
-	public void generateCertificate() throws ParseException, InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException {
+	public void generateCertificate() throws ParseException, InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, SignatureException, IOException, UnrecoverableKeyException, KeyStoreException {
 		CertificateGenerator certi = new CertificateGenerator();
 		
 		//kreira se self signed sertifikat
@@ -153,10 +174,36 @@ public class KeyPairEntryPasswordForm extends JDialog{
 	    builder.addRDN(BCStyle.UID, dictionary.get("Alias")+uid );
 	    
 	    String sn=Integer.toString(uid);
-	    
+	    IssuerData issuerData = null;
 	    
 		//kreiraju se podaci za issuer-a
-		IssuerData issuerData = new IssuerData(keyPair.getPrivate(), builder.build());
+	    if (keyStore==null){
+	    	issuerData = new IssuerData(keyPair.getPrivate(), builder.build());
+		}else {
+			X509Certificate cert = null;
+			ArrayList<String> aliases = null;
+			try {
+				aliases = Collections.list(keyStore.aliases());
+			} catch (KeyStoreException e) {
+				e.printStackTrace();
+			}
+			
+
+			try {
+				cert = (X509Certificate) keyStore.getCertificate(aliases.get(0));
+			} catch (KeyStoreException e) {
+				e.printStackTrace();
+			}
+
+			X500Name caX500Name = new X500Name(cert.getSubjectX500Principal().getName());
+			
+			//menjamo issuarData podacima o sertifikatu koji ga izdaje, potpisujemo ga njegovim privatnim kljucem
+			issuerData = new IssuerData((PrivateKey)keyStore.getKey(
+					aliases.get(0),	dictionary.get("PasswordKey").toCharArray())
+					, caX500Name);
+
+		}
+	    
 		//kreiraju se podaci za vlasnika
 		SubjectData subjectData = new SubjectData(keyPair.getPublic(), builder.build(), sn, startDate, endDate);
 		
